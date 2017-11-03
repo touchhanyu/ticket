@@ -1,0 +1,127 @@
+<html>
+<head>
+	<script type="text/javascript" src="./js/jquery-2.2.0.js"></script>
+	<script type="text/javascript">
+		var ans;
+		var init = "https://kyfw.12306.cn/otn/login/init";
+		var ldat = "https://kyfw.12306.cn/otn/dynamicJs/lxzldat";
+		var jcok = "https://kyfw.12306.cn/otn/resources/js/framework/data.jcokies.js";
+		var uatk = "https://kyfw.12306.cn/passport/web/auth/uamtk";
+		var captcha = "https://kyfw.12306.cn/otn/resources/js/newpasscode/captcha_js.js?_=1509519184670";
+		function initFun() {
+			$.ajax({
+				url : init,
+				type : "get",
+				dataType : 'jsonp',
+				success : function(d) {
+					console.log("initFun:" + d);
+				}
+			});
+		}
+		function ldatFun() {
+			$.ajax({
+				url : ldat,
+				type : "get",
+				dataType : 'jsonp',
+				success : function(d) {
+					console.log("ldatFun:" + d);
+				}
+			});
+		}
+		function jcokFun() {
+			$.ajax({
+				url : jcok,
+				type : "get",
+				dataType : 'jsonp',
+				success : function(d) {
+					console.log("jcokFun:" + d);
+				}
+			});
+		}
+		function showCode() {
+			$.ajax({
+				url : 'https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand&0.4301967097811280',
+				type : 'get',
+				success : function(d) {
+					console.log(d)
+				}
+			});
+		}
+		function randCode() {
+			ans = $('#answer').val();
+			console.log(ans);
+			$.ajax({
+				url : 'https://kyfw.12306.cn/passport/captcha/captcha-check',
+				type : 'post',
+				dataType : 'json',
+				xhrFields : {
+					withCredentials : true
+				},
+				data : {
+					answer : ans,
+					login_site : "E",
+					rand : "sjrand"
+				},
+				async : false,
+				success : function(d) {
+					console.log(d);
+					if (d.result_code == '4') {
+						login();
+					}
+				}
+			});
+		}
+		function login() {
+			var name = '18500613344';
+			var password= '910715hy';
+			var login = 'https://kyfw.12306.cn/passport/web/login';
+			$.ajax({
+				url : login2,
+				type : 'post',
+				dataType : 'json',
+				data : {
+					username : name,
+					password : password,
+					appid : 'otn'
+				},
+				success : function(d) {
+					console.log(d);
+					alert(d.result_message)	
+				}
+			});
+		}
+	</script>
+</head>
+<body>
+<form>
+	<table>
+		<tr>
+			<td>answer</td>
+			<td>
+				<input id="answer" type='text'/>
+			</td>
+		</tr>
+		<tr>
+			<td>username</td>
+			<td>
+				<input id='username' type='text'/>
+			</td>
+		</tr>
+		<tr>
+			<td>password</td>
+			<td>
+				<input id='password' type='text'/>
+			</td>
+		</tr>
+	</table>
+	<center>
+		<input type="button" value="init" onclick="initFun();"/>
+		<input type="button" value="ldat" onclick="ldatFun()"/>
+		<input type="button" value="jcok" onclick="jcokFun();"/>
+		<input type="button" value="showCode" onclick="showCode();"/>
+		<input id="subForm" type="button" value="SUBMITFORM" onclick="randCode();"/>
+		<input type="button" value="LOGIN" onclick="login();"/>
+	</center>
+</form>
+</body>
+</html>
