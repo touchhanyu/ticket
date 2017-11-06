@@ -20,7 +20,8 @@ public class TicketSession {
 	private String _passport_ct;
 	@TCookie("_passport_session")
 	private String _passport_session;
-//	private String _jc_save_wfdc_flag;
+	private String _jc_save_wfdc_flag = "dc";
+	private String current_captcha_type = "Z";
 	private String uamtk;
 
 	public String getJSESSIONID() {
@@ -87,6 +88,22 @@ public class TicketSession {
 		this._passport_session = _passport_session;
 	}
 
+	public String get_jc_save_wfdc_flag() {
+		return _jc_save_wfdc_flag;
+	}
+
+	public void set_jc_save_wfdc_flag(String _jc_save_wfdc_flag) {
+		this._jc_save_wfdc_flag = _jc_save_wfdc_flag;
+	}
+
+	public String getCurrent_captcha_type() {
+		return current_captcha_type;
+	}
+
+	public void setCurrent_captcha_type(String current_captcha_type) {
+		this.current_captcha_type = current_captcha_type;
+	}
+
 	public String getUamtk() {
 		return uamtk;
 	}
@@ -114,8 +131,12 @@ public class TicketSession {
 			str += "_passport_ct=" + _passport_ct + ";";
 		if (_passport_session != null)
 			str += "_passport_session=" + _passport_session + ";";
+		if (_jc_save_wfdc_flag != null)
+			str += "_jc_save_wfdc_flag=" + _jc_save_wfdc_flag + ";";
+		if (current_captcha_type != null)
+			str += "current_captcha_type=" + current_captcha_type + ";";
 		if (uamtk != null)
-			str += "uamtk=" + uamtk;
+			str += "tk=" + uamtk;
 		return str;
 	}
 }

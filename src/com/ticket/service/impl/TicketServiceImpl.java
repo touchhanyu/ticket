@@ -1,12 +1,11 @@
 package com.ticket.service.impl;
 
 import java.io.File;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
-import java.util.UUID;
 
 import com.ticket.dto.LeftTicketDTO;
 import com.ticket.entity.PURPOSE_CODES;
@@ -21,23 +20,23 @@ import com.ticket.util.SQLUtil;
 public class TicketServiceImpl implements TicketService {
 
 	@Override
-	public List<Ticket> queryTicket(LeftTicketDTO leftTicketDTO, PURPOSE_CODES code) {
+	public List<Ticket> queryTicket(LeftTicketDTO dto) {
 		// TODO Auto-generated method stub
 		Properties prop = RequestUtil.prop;
 		String url = prop.getProperty("query");
-		url += "leftTicketDTO.train_date=" + leftTicketDTO.getTran_date() + "&";
-		url += "leftTicketDTO.from_station=" + leftTicketDTO.getFrom_station() + "&";
-		url += "leftTicketDTO.to_station=" + leftTicketDTO.getTo_station() + "&";
-		url += "purpose_codes=" + code.toString();
+		url += "leftTicketDTO.train_date=" + dto.getTran_date() + "&";
+		url += "leftTicketDTO.from_station=" + dto.getFrom_station() + "&";
+		url += "leftTicketDTO.to_station=" + dto.getTo_station() + "&";
+		url += "purpose_codes=" + dto.getCodes().toString();
 		String json = RequestUtil.requestGet(url);
 		ParseDataHelp help = new ParseDataHelp() {
 			@SuppressWarnings("unchecked")
 			@Override
 			public <E> E parseJson(String json) {
 				// TODO Auto-generated method stub
-				System.out.println(json);
 				String[] split = json.split("\\|");
 				Ticket ticket = new Ticket();
+				ticket.setSecretStr(split[0]);
 				ticket.setTrain_no(split[2]);
 				ticket.setStation_train_code(split[3]);
 				ticket.setStart_station_telecode(split[4]);
@@ -75,7 +74,9 @@ public class TicketServiceImpl implements TicketService {
 				return (E) ticket;
 			}
 		};
-		List<Ticket> tickets = JsonUtil.parse(json, Ticket.class, help);
+		List<Ticket> tickets = null;
+		if (json != null && !"".equals(json))
+			tickets = JsonUtil.parse(json, Ticket.class, help);
 		return tickets;
 	}
 
@@ -130,7 +131,6 @@ public class TicketServiceImpl implements TicketService {
 			if (i != split.length -1)
 				randCode += ",";
 		}
-		System.out.println("answer:" + randCode);
 		String url = RequestUtil.prop.getProperty("captchacheck");
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("answer", randCode);
@@ -145,6 +145,45 @@ public class TicketServiceImpl implements TicketService {
 		map.put("appid", "otn");
 		String json = RequestUtil.requestPost(url, map);
 		System.out.println(json);
+		map.clear();
+		url = RequestUtil.prop.getProperty("userLogin");
+		map.put("_json_att", "");
+		String ss = RequestUtil.requestPost(url, map);
+		System.out.println(ss);
+		url = RequestUtil.prop.getProperty("login2");
+		String str = RequestUtil.requestGet(url);
+		System.out.println(str);
 	}
 
+	@Override
+	public void booking(String secretStr, String trainDate, String backTrainDate,
+			PURPOSE_CODES purposeCodes, String queryFromStation, String queryToStation) {
+		// TODO Auto-generated method stub
+		String url = RequestUtil.prop.getProperty("checkUser");
+		Map<String, String> para = new HashMap<String, String>();
+		para.put("_json_att", "");
+		System.out.println(RequestUtil.requestPost(url, para));
+		para.clear();
+		url = RequestUtil.prop.getProperty("booking");
+		para.put("secretStr", secretStr);
+		para.put("train_date", trainDate);
+		para.put("back_train_date", backTrainDate);
+		para.put("tour_flag", "dc");
+		para.put("purpose_codes", purposeCodes.toString());
+		para.put("query_from_station_name", queryFromStation);
+		para.put("query_to_station_name", queryToStation);
+		para.put("undefined", "");
+//		String str = RequestUtil.requestPost(url, para);
+//		System.out.println(str);
+	}
+
+	@Override
+	public void initParam() {
+		// TODO Auto-generated method stub
+		String url = RequestUtil.prop.getProperty("initDc");
+		Map<String, String> para = new HashMap<String, String>();
+		para.put("_json_att", "");
+		String str = RequestUtil.requestPost(url, para);
+		System.out.println(str);
+	}
 }

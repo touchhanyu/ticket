@@ -10,13 +10,10 @@ public interface TicketService {
 	/**
 	 * 查询
 	 * 
-	 * @param from
-	 * @param to
-	 * @param date
-	 * @param code
+	 * @param leftTicketDTO
 	 * @return
 	 */
-	public List<Ticket> queryTicket(LeftTicketDTO leftTicketDTO, PURPOSE_CODES code);
+	public List<Ticket> queryTicket(LeftTicketDTO leftTicketDTO);
 
 	/**
 	 * 同步车站信息
@@ -38,4 +35,19 @@ public interface TicketService {
 	 * @param randcode
 	 */
 	public void login(String username, String password, String randcode);
+
+	/**
+	 * 预定
+	 * 
+	 * @param secretStr
+	 * @param trainDate
+	 * @param backTrainDate
+	 * @param tourFlag
+	 * @param purposeCodes
+	 * @param queryFromStation
+	 * @param queryToStation
+	 */
+	public void booking(String secretStr, String trainDate, String backTrainDate, PURPOSE_CODES purposeCodes, String queryFromStation, String queryToStation);
+
+	public void initParam();
 }

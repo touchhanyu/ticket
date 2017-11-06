@@ -14,6 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -101,6 +102,19 @@ public class RequestUtil {
 			String host = url.getHost();
 			TicketSession tSession = sessions.get(host);
 			URLConnection conn = url.openConnection();
+			conn.setDoInput(true);
+			conn.setUseCaches(false);
+			conn.setDefaultUseCaches(false);
+			if (tSession != null) {
+				System.out.println(tSession.toString());
+				conn.setRequestProperty("Cookie", tSession.toString());
+			}
+			conn.setRequestProperty("Accpet", "application/json, text/javascript, */*; q=0.01");
+			conn.setRequestProperty("Accpet-Encoding", "gzip, deflate, br");
+			conn.setRequestProperty("Accpet-Language", "zh-CN,zh;q=0.8");
+			conn.setRequestProperty("Connection", "keep-alive");
+			conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+			conn.setRequestProperty("X-Requested-With", "XMLHttpRequest");
 			if (checkHttps) {
 				https = (HttpsURLConnection) conn;
 				https.setHostnameVerifier(new HostnameVerifier() {
@@ -110,19 +124,9 @@ public class RequestUtil {
 						return true;
 					}
 				});
-				https.setRequestMethod(method);
 				https.setDoOutput(true);
-				https.setDoInput(true);
-				https.setUseCaches(false);
+				https.setRequestMethod(method);
 				https.setInstanceFollowRedirects(true);
-				if (tSession != null)
-					https.setRequestProperty("Cookie", tSession.toString());
-				https.setRequestProperty("Accpet", "application/json, text/javascript, */*; q=0.01");
-				https.setRequestProperty("Accpet-Encoding", "gzip, deflate, br");
-				https.setRequestProperty("Accpet-Language", "zh-CN,zh;q=0.8");
-				https.setRequestProperty("Connection", "keep-alive");
-				https.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-				https.setRequestProperty("X-Requested-With", "XMLHttpRequest");
 				https.connect();
 				StringBuffer sb = new StringBuffer();
 				if ("POST".equals(method)) {
@@ -133,7 +137,8 @@ public class RequestUtil {
 						while (it.hasNext()) {
 							Entry<String, String> entry = it.next();
 							sb.append(entry.getKey());
-							sb.append("=").append(entry.getValue()).append("&");
+							String value = entry.getValue();
+							sb.append("=").append(URLEncoder.encode(value)).append("&");
 						}
 						String str = sb.toString();
 						dos.write(str.getBytes(CHARSET));
@@ -141,41 +146,7 @@ public class RequestUtil {
 						dos.close();
 					}
 				}
-				Map<String, List<String>> maps = https.getHeaderFields();
-				Set<Entry<String, List<String>>> set = maps.entrySet();
-				Iterator<Entry<String, List<String>>> it = set.iterator();
-				TicketSession session = sessions.get(host);
-				if (session == null)
-					session = new TicketSession();
-				while (it.hasNext()) {
-					Entry<String, List<String>> next = it.next();
-					if ("Set-Cookie".equals(next.getKey())) {
-						List<String> list = next.getValue();
-						for (int i = 0; i < list.size(); i++) {
-							String[] split = list.get(i).split(";")[0].split("=");
-							try {
-								if (split.length == 2) {
-									String key = split[0];
-									String value = split[1];
-									Field field = TicketSession.class.getDeclaredField(key);
-									field.setAccessible(true);
-									field.set(session, value);
-								}
-							} catch (NoSuchFieldException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (SecurityException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (IllegalAccessException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-						break;
-					}
-				}
-				sessions.put(host, session);
+				saveSession(https, host);
 				is = https.getInputStream();
 			} else {
 				http = (HttpURLConnection) conn;
@@ -185,11 +156,9 @@ public class RequestUtil {
 					Iterator<Entry<String, String>> it = entrySet.iterator();
 					while (it.hasNext()) {
 						Entry<String, String> entry = it.next();
-						http.setRequestProperty(entry.getKey(), entry.getValue());
+						
 					}
 				}
-				http.setDoInput(true);
-				http.setDefaultUseCaches(false);
 				http.connect();
 				is = http.getInputStream();
 			}
@@ -204,6 +173,50 @@ public class RequestUtil {
 			e.printStackTrace();
 		}
 		return is;
+	}
+
+	/**
+	 * 保存session
+	 * 
+	 * @param conn
+	 * @param host
+	 */
+	private static void saveSession (URLConnection conn, String host) {
+		Map<String, List<String>> maps = conn.getHeaderFields();
+		Set<Entry<String, List<String>>> set = maps.entrySet();
+		Iterator<Entry<String, List<String>>> it = set.iterator();
+		TicketSession session = sessions.get(host);
+		if (session == null)
+			session = new TicketSession();
+		while (it.hasNext()) {
+			Entry<String, List<String>> next = it.next();
+			if ("Set-Cookie".equals(next.getKey())) {
+				List<String> list = next.getValue();
+				for (int i = 0; i < list.size(); i++) {
+					String[] split = list.get(i).split(";")[0].split("=");
+					try {
+						if (split.length == 2) {
+							String key = split[0];
+							String value = split[1];
+							Field field = TicketSession.class.getDeclaredField(key);
+							field.setAccessible(true);
+							field.set(session, value);
+						}
+					} catch (NoSuchFieldException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (SecurityException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				break;
+			}
+		}
+		sessions.put(host, session);
 	}
 
 	private static String dealJson(InputStream is, String charSet) {

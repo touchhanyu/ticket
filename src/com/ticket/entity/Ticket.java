@@ -1,6 +1,7 @@
 package com.ticket.entity;
 
 public class Ticket {
+	private String secretStr;
 	private String train_no;
 	private String station_train_code;
 	private String start_station_telecode;
@@ -49,6 +50,14 @@ public class Ticket {
 	private String tz_num;// 特等座&商务座
 	private String seat_feature;
 	private String seat_types;
+
+	public String getSecretStr() {
+		return secretStr;
+	}
+
+	public void setSecretStr(String secretStr) {
+		this.secretStr = secretStr;
+	}
 
 	public String getTrain_no() {
 		return train_no;
