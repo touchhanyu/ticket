@@ -14,6 +14,7 @@ import com.ticket.entity.Ticket;
 import com.ticket.service.TicketService;
 import com.ticket.util.JsonUtil;
 import com.ticket.util.ParseDataHelp;
+import com.ticket.util.RandCodeUtil;
 import com.ticket.util.RequestUtil;
 import com.ticket.util.SQLUtil;
 
@@ -106,7 +107,9 @@ public class TicketServiceImpl implements TicketService {
 	@Override
 	public String loginImageCode() {
 		// TODO Auto-generated method stub
-		String url = RequestUtil.prop.getProperty("logpicture");
+		String url = RequestUtil.prop.getProperty("init");
+		RequestUtil.requestGet(url);
+		url = RequestUtil.prop.getProperty("captcha");
 		String path = TicketServiceImpl.class.getResource("/").getPath();
 		path = URLDecoder.decode(path);
 		File file = new File(path);
@@ -116,25 +119,32 @@ public class TicketServiceImpl implements TicketService {
 	}
 
 	@Override
-	public void login(String username, String password, String randcode) {
+	public void login(String username, String password, String randCode) {
 		// TODO Auto-generated method stub
-		String url = RequestUtil.prop.getProperty("init");
+		String[] split = randCode.split(",");
+		randCode = "";
+		for (int i = 0; i < split.length; i++) {
+			String xy = split[i];
+			int index = Integer.parseInt(xy);
+			randCode += RandCodeUtil._4x2[index - 1];
+			if (i != split.length -1)
+				randCode += ",";
+		}
+		System.out.println("answer:" + randCode);
+		String url = RequestUtil.prop.getProperty("captchacheck");
 		HashMap<String, String> map = new HashMap<String, String>();
-		String s = RequestUtil.requestGet(url);
-//		String url = RequestUtil.prop.getProperty("captchacheck");
-//		HashMap<String, String> map = new HashMap<String, String>();
-//		map.put("answer", "115,49,121,116");
-//		map.put("login_site", "E");
-//		map.put("rand", "sjrand");
-//		String s = RequestUtil.requestPost(url, map);
-//		System.out.println(s);
-//		map.clear();
-//		url = RequestUtil.prop.getProperty("login");
-//		map.put("username", username);
-//		map.put("password", password);
-//		map.put("appid", "otn");
-//		String json = RequestUtil.requestPost(url, map);
-//		System.out.println(json);
+		map.put("answer", randCode);
+		map.put("login_site", "E");
+		map.put("rand", "sjrand");
+		String s = RequestUtil.requestPost(url, map);
+		System.out.println(s);
+		map.clear();
+		url = RequestUtil.prop.getProperty("login");
+		map.put("username", username);
+		map.put("password", password);
+		map.put("appid", "otn");
+		String json = RequestUtil.requestPost(url, map);
+		System.out.println(json);
 	}
 
 }

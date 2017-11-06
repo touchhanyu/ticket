@@ -9,12 +9,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -134,15 +136,46 @@ public class RequestUtil {
 							sb.append("=").append(entry.getValue()).append("&");
 						}
 						String str = sb.toString();
-						System.out.println(str);
 						dos.write(str.getBytes(CHARSET));
 						dos.flush();
 						dos.close();
 					}
 				}
-				String session = https.getHeaderField("Set-Cookie").split(";")[0];
-				System.out.println(session);
-				sessions.put(host, null);
+				Map<String, List<String>> maps = https.getHeaderFields();
+				Set<Entry<String, List<String>>> set = maps.entrySet();
+				Iterator<Entry<String, List<String>>> it = set.iterator();
+				TicketSession session = sessions.get(host);
+				if (session == null)
+					session = new TicketSession();
+				while (it.hasNext()) {
+					Entry<String, List<String>> next = it.next();
+					if ("Set-Cookie".equals(next.getKey())) {
+						List<String> list = next.getValue();
+						for (int i = 0; i < list.size(); i++) {
+							String[] split = list.get(i).split(";")[0].split("=");
+							try {
+								if (split.length == 2) {
+									String key = split[0];
+									String value = split[1];
+									Field field = TicketSession.class.getDeclaredField(key);
+									field.setAccessible(true);
+									field.set(session, value);
+								}
+							} catch (NoSuchFieldException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (SecurityException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (IllegalAccessException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+						break;
+					}
+				}
+				sessions.put(host, session);
 				is = https.getInputStream();
 			} else {
 				http = (HttpURLConnection) conn;
@@ -164,6 +197,9 @@ public class RequestUtil {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

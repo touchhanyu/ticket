@@ -1,5 +1,7 @@
 package com.ticket.test;
 
+import java.util.Scanner;
+
 import org.junit.Test;
 
 import com.ticket.dto.LeftTicketDTO;
@@ -34,6 +36,13 @@ public class TicketTest {
 	@Test
 	public void testLogin() {
 		TicketService impl = new TicketServiceImpl();
-		impl.login("18500613344", "hy", "4");
+		impl.loginImageCode();
+		Scanner sc = new Scanner(System.in);
+		System.out.println("password:");
+		String pw = sc.nextLine();
+		System.out.println("randCode:");
+		String randCode = sc.nextLine();
+		sc.close();
+		impl.login("18500613344", pw, randCode);
 	}
 }
