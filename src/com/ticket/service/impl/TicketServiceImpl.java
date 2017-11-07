@@ -146,11 +146,19 @@ public class TicketServiceImpl implements TicketService {
 		String json = RequestUtil.requestPost(url, map);
 		System.out.println(json);
 		map.clear();
-		url = RequestUtil.prop.getProperty("userLogin");
-		map.put("_json_att", "");
-		String ss = RequestUtil.requestPost(url, map);
-		System.out.println(ss);
+//		url = RequestUtil.prop.getProperty("userLogin");
+//		map.put("_json_att", "");
+//		String ss = RequestUtil.requestPost(url, map);
+//		System.out.println(ss);
 		url = RequestUtil.prop.getProperty("login2");
+		String str = RequestUtil.requestGet(url);
+		System.out.println(str);
+	}
+
+	@Override
+	public void initUser() {
+		// TODO Auto-generated method stub
+		String url = RequestUtil.prop.getProperty("getperson");
 		String str = RequestUtil.requestGet(url);
 		System.out.println(str);
 	}

@@ -47,6 +47,12 @@ public class TicketTest {
 	}
 
 	@Test
+	public void testInitPerson() {
+		testLogin();
+		impl.initUser();
+	}
+
+	@Test
 	public void testBooking() {
 		testLogin();
 		LeftTicketDTO dto = new LeftTicketDTO();
@@ -60,7 +66,7 @@ public class TicketTest {
 			String secretStr = ticket.getSecretStr();
 			String trainDate = "2017-11-30";
 			impl.booking(secretStr, trainDate, trainDate, dto.getCodes(), "北京", "合肥");
-			impl.initParam();
+//			impl.initParam();
 		}
 	}
 }

@@ -37,6 +37,11 @@ public interface TicketService {
 	public void login(String username, String password, String randcode);
 
 	/**
+	 * 初始化联系人
+	 */
+	public void initUser();
+
+	/**
 	 * 预定
 	 * 
 	 * @param secretStr
