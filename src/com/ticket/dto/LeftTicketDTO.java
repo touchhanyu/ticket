@@ -1,7 +1,5 @@
 package com.ticket.dto;
 
-import java.lang.reflect.Field;
-
 import com.ticket.entity.PURPOSE_CODES;
 
 public class LeftTicketDTO {
