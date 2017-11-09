@@ -1,16 +1,22 @@
 package com.ticket.action;
 
 import java.io.PrintWriter;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.google.gson.Gson;
+import com.ticket.dto.LeftTicketDTO;
+import com.ticket.dto.TicketGridDTO;
+import com.ticket.entity.PURPOSE_CODES;
+import com.ticket.entity.Ticket;
 import com.ticket.service.TicketService;
 import com.ticket.service.impl.TicketServiceImpl;
 
 @Controller
-@RequestMapping("/login")
+@RequestMapping("/ticket")
 public class TicketAction {
 	private TicketService service = new TicketServiceImpl();
 
@@ -25,5 +31,23 @@ public class TicketAction {
 			@RequestParam(value = "password") String password,
 			@RequestParam(value = "randcode") String randcode, PrintWriter pw) {
 		service.login(username, password, randcode);
+	}
+
+	@RequestMapping("/ticketQuery")
+	public void queryTicket(@RequestParam(value = "tranDate") String tranDate,
+			@RequestParam(value = "from_station") String from_station,
+			@RequestParam(value = "to_station") String to_station, PrintWriter pw) {
+		LeftTicketDTO dto = new LeftTicketDTO();
+		dto.setTran_date(tranDate);
+		dto.setFrom_station(from_station);
+		dto.setTo_station(to_station);
+		dto.setCodes(PURPOSE_CODES.ADULT);
+		List<Ticket> list = service.queryTicket(dto);
+		Gson gson = new Gson();
+		TicketGridDTO grid = new TicketGridDTO();
+		grid.setPage(list.size());
+		grid.setRows(list);
+		String json = gson.toJson(grid);
+		pw.write(json);
 	}
 }
