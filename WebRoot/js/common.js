@@ -43,7 +43,6 @@ function makeGrid(obj, columns, data) {
 			} else {
 				htmlStr += columns[j].value + '</td>';
 			}
-
 		}
 		htmlStr += '</tr>';
 	}
