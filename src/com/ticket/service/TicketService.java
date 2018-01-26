@@ -3,10 +3,14 @@ package com.ticket.service;
 import java.util.List;
 
 import com.ticket.dto.LeftTicketDTO;
+import com.ticket.dto.StationDTO;
 import com.ticket.entity.PURPOSE_CODES;
 import com.ticket.entity.Ticket;
 
 public interface TicketService {
+
+	public List<StationDTO> queryStation(String pinyin);
+
 	/**
 	 * 查询
 	 * 
@@ -52,7 +56,8 @@ public interface TicketService {
 	 * @param queryFromStation
 	 * @param queryToStation
 	 */
-	public void booking(String secretStr, String trainDate, String backTrainDate, PURPOSE_CODES purposeCodes, String queryFromStation, String queryToStation);
+	public void booking(String secretStr, String trainDate, String backTrainDate, PURPOSE_CODES purposeCodes,
+			String queryFromStation, String queryToStation);
 
 	public void initParam();
 }

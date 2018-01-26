@@ -3,8 +3,23 @@
 <head>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap-theme.min.css" />
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/signin.css" />
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-2.2.0.min.js"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/js/font-awesome/css/font-awesome.min.css"/>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/js/Ionicons/css/ionicons.min.css"/>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/js/bootstrap-datepicker/css/bootstrap-datepicker.min.css" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/js/select2/css/select2.min.css" />
+<link rel="stylesheet" href="${pageContext.request.contextPath}/js/datatables.net-bs/css/dataTables.bootstrap.min.css"/>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/js/toastr/toastr.min.css" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/js/sweetalert2/sweetalert2.min.css" />
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/bootstrap-datepicker/js/bootstrap-datepicker.zh-CN.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/select2/js/select2.full.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/select2/js/i18n/zh-CN.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/datatables.net/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/toastr/toastr.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/sweetalert2/sweetalert2.all.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/common.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/ticket/ticket.js"></script>
 <script type="text/javascript">
@@ -12,27 +27,50 @@
 </script>
 </head>
 <body>
+	<div class="header"></div>
 	<div class="container">
-		<form id="loginfm" class="form-signin">
-			<div class="panel-body">
-				<h2 class="form-signin-heading"></h2>
-				<!-- 
-				<label for="inputEmail" class="sr-only">用户名</label>
-				 -->
-				<input type="text" id="username" class="form-control" placeholder="用户名" required autofocus/>
-				<!-- 
-				<label for="inputPassword" class="sr-only">密码</label>
-				 -->
-				<input type="password" id="password" class="form-control" placeholder="密码" required/>
-				<img id="randcode" class="img-thumbnail" src="" onclick="captcha();"/>
-				<!-- 
-				<label for="inputEmail" class="sr-only">验证码</label>
-				 -->
-				<input type="text" id="randcode" class="form-control" placeholder="验证码" required/>
-				<button class="btn btn-success btn-block" onclick="login();">登     录</button>
+		<div class="panel panel-info">
+			<div class="panel-heading">
+				余票查询
 			</div>
-		</form>
-		<div id="tickettb"/>
+			<div class="panel-body">
+				<form class="form-horizontal" role="form">
+					<div class="row">
+						<div class="col-sm-6">
+							<div class="form-group">
+								<label for="fromStation" class="col-sm-3 control-label">出发地</label>
+								<div class="col-sm-7">
+									<select type="text" id="fromStation" class="form-control select2" style="width: 100%;"></select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="fromStation" class="col-sm-3 control-label">出发日期</label>
+								<div class="col-sm-7">
+									<div class="input-group date date-picker">
+										<div class="input-group-addon">
+											<i class="fa fa-calendar"></i>
+										</div>
+										<input type="text" class="form-control pull-right" id="tranDate" name="tranDate" readonly/>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="form-group">
+								<label for="toStation" class="col-sm-3 control-label">目的地</label>
+								<div class="col-sm-7">
+									<select type="text" id="toStation" class="form-control select2" style="width: 100%;"></select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+				<center>
+					<button type="button" class="btn btn-info" onclick="queryTicket();">查&nbsp;询</button>
+				</center>
+				<table id="tickettb" class="table table-striped table-bordered"></table>
+			</div>
+		</div>
 	</div>
 </body>
 </html>

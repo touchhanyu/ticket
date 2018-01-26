@@ -2,12 +2,14 @@ package com.ticket.service.impl;
 
 import java.io.File;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import com.ticket.dto.LeftTicketDTO;
+import com.ticket.dto.StationDTO;
 import com.ticket.entity.PURPOSE_CODES;
 import com.ticket.entity.Ticket;
 import com.ticket.service.TicketService;
@@ -18,6 +20,24 @@ import com.ticket.util.RequestUtil;
 import com.ticket.util.SQLUtil;
 
 public class TicketServiceImpl implements TicketService {
+
+	@Override
+	public List<StationDTO> queryStation(String pinyin) {
+		// TODO Auto-generated method stub
+		List<StationDTO> stations = new ArrayList<StationDTO>();
+		String sql = "select NAME,CNAME from station where pinyin like '%" + pinyin + "%'";
+		List<Map<String, Object>> list = SQLUtil.query(sql);
+		for (int i = 0; i < list.size(); i++) {
+			Map<String, Object> map = list.get(i);
+			String name = (String) map.get("NAME");
+			String cname = (String) map.get("CNAME");
+			StationDTO station = new StationDTO();
+			station.setId(name);
+			station.setText(cname);
+			stations.add(station);
+		}
+		return stations;
+	}
 
 	@Override
 	public List<Ticket> queryTicket(LeftTicketDTO dto) {
@@ -40,9 +60,25 @@ public class TicketServiceImpl implements TicketService {
 				ticket.setTrain_no(split[2]);
 				ticket.setStation_train_code(split[3]);
 				ticket.setStart_station_telecode(split[4]);
-				ticket.setStart_station_name(split[6]);
 				ticket.setEnd_station_telecode(split[5]);
-				ticket.setEnd_station_name(split[7]);
+				List<Map<String,Object>> list = SQLUtil.query("select NAME,CNAME from station where name in('" + split[6] + "','" + split[7] + "')");
+				if (list.size() == 1) {
+					Map<String, Object> map = list.get(0);
+					ticket.setStart_station_name((String) map.get("CNAME"));
+					ticket.setEnd_station_name((String) map.get("CNAME"));
+				} else {
+					Map<String, Object> map = list.get(0);
+					String name = (String) map.get("NAME");
+					if (name.equals(split[6])) {
+						ticket.setStart_station_name((String) map.get("CNAME"));
+						map = list.get(1);
+						ticket.setEnd_station_name((String) map.get("CNAME"));
+					} else {
+						ticket.setEnd_station_name((String) map.get("CNAME"));
+						map = list.get(1);
+						ticket.setStart_station_name((String) map.get("CNAME"));
+					}
+				}
 				ticket.setStart_time(split[8]);
 				ticket.setArrive_time(split[9]);
 				ticket.setLishi(split[10]);

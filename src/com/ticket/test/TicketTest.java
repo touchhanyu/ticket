@@ -17,9 +17,9 @@ public class TicketTest {
 	@Test
 	public void testQuery() {
 		LeftTicketDTO dto = new LeftTicketDTO();
-		dto.setTran_date("2017-11-30");
+		dto.setTran_date("2018-02-12");
 		dto.setFrom_station("BJP");
-		dto.setTo_station("HFH");
+		dto.setTo_station("CSQ");
 		dto.setCodes(PURPOSE_CODES.ADULT);
 		impl.queryTicket(dto);
 	}

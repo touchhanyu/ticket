@@ -28,8 +28,7 @@ public class SQLUtil {
 			while (rs.next()) {
 				HashMap<String, Object> map = new HashMap<String, Object>();
 				for (int i = 0; i < count; i++) {
-					rs.getObject(i);
-					map.put(metaData.getColumnName(i), rs.getObject(i + 1));
+					map.put(metaData.getColumnName(i + 1), rs.getObject(i + 1));
 				}
 				list.add(map);
 			}

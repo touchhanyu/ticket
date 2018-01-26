@@ -1,7 +1,88 @@
+var dt;
 $(function() {
-	captcha();
-	$('#loginfm').hide();
-	queryTicket();
+	$('#fromStation').select2({
+		language : 'zh-CN',
+		ajax : {
+			url : basePath + '/ticket/queryStation',
+			dataType : 'json',
+			data : function(params) {
+				return {
+					pinyin : params.term
+				};
+			},
+			processResults : function(data) {
+				return {
+					results : data
+				};
+			},
+			cache : true
+		},
+		minimumInputLength : 0,
+		allowClear : true
+	});
+	$('#toStation').select2({
+		language : 'zh-CN',
+		ajax : {
+			url : basePath + '/ticket/queryStation',
+			dataType : 'json',
+			data : function(params) {
+				return {
+					pinyin : params.term
+				};
+			},
+			processResults : function(data) {
+				return {
+					results : data
+				};
+			},
+			cache : true
+		},
+		minimumInputLength : 0,
+		allowClear : true
+	});
+	$('#tranDate').datepicker({
+		autoclose : true,
+		language : 'zh-CN',
+		clearBtn : true,
+		todayBtn : false,
+		format : {
+			toDisplay : function(date, format, language) {
+				return dateFormat(date);
+			},
+			toValue : function(date, format, language) {
+				return dateFormat(date);
+			}
+		}
+	});
+	dataTableOption.ajax.url = basePath + '/ticket/ticketQuery';
+	dataTableOption.ajax.data = {
+		tranDate : '',
+		from_station : '',
+		to_station : ''
+	};
+	dataTableOption.scrollY = '300px';
+	dataTableOption.scrollCollapse = true;
+	dataTableOption.columns = [
+		{ data : 'secretStr', title : 'secretStr', searchable : false, orderable : false, visible : false },
+		{ data : 'train_no', title : 'train_no', searchable : false, orderable : false, visible : false },
+		{ data : 'station_train_code', title : '车次', orderable : false},
+		{ data : 'start_station_name', title : '始发站', orderable : false},
+		{ data : 'end_station_name', title : '终点站', orderable : false},
+		{ data : 'start_time', title : '发车时间', orderable : false},
+		{ data : 'arrive_time', title : '到达时间', orderable : false},
+		{ data : 'lishi', title : '历时', orderable : false},
+		{ data : 'tz_num', title : '特等座/商务座', orderable : false},
+		{ data : 'zy_num', title : '一等座', orderable : false},
+		{ data : 'ze_num', title : '二等座', orderable : false},
+		{ data : 'gr_num', title : '高级软卧', orderable : false},
+		{ data : 'rw_num', title : '软卧', orderable : false},
+		{ data : 'yw_num', title : '硬卧', orderable : false},
+		{ data : 'yz_num', title : '硬座', orderable : false},
+		{ data : 'wz_num', title : '无座', orderable : false},
+		{ data : 'oper', title : '操作', orderable : false, render : function(data, type, full, meta) {
+			return '<button class="btn btn-success" onclick="void(0);">预定</button>';
+		} } ];
+	dt = $('#tickettb').DataTable(dataTableOption);
 });
 function captcha() {
 	$.ajax({
@@ -26,85 +107,14 @@ function login() {
 	});
 }
 function queryTicket() {
-	$('#tickettb').grid({
-		url : basePath + '/ticket/ticketQuery',
-		type : 'POST',
-		data : {
-			tranDate : '2017-11-30',
-			from_station : 'BJP',
-			to_station : 'HFH'
-		},
-		columns : [ {
-			field : 'secretStr',
-			name : 'secretStr',
-			title : 'secretStr',
-			hide : true
-		}, {
-			field : 'train_no',
-			name : 'train_no',
-			title : 'train_no',
-			hide : true
-		}, {
-			field : 'station_train_code',
-			name : 'station_train_code',
-			title : '车次',
-		}, {
-			field : 'start_station_name',
-			name : 'start_station_name',
-			title : '始发站'
-		}, {
-			field : 'end_station_name',
-			name : 'end_station_name',
-			title : '终点站'
-		}, {
-			field : 'start_time',
-			name : 'start_time',
-			title : '发车时间'
-		}, {
-			field : 'arrive_time',
-			name : 'arrive_time',
-			title : '到达时间'
-		}, {
-			field : 'lishi',
-			name : 'lishi',
-			title : '历时'
-		}, {
-			field : 'tz_num',
-			name : 'tz_num',
-			title : '特等座/商务座'
-		}, {
-			field : 'zy_num',
-			name : 'zy_num',
-			title : '一等座'
-		}, {
-			field : 'ze_num',
-			name : 'ze_num',
-			title : '二等座'
-		}, {
-			field : 'gr_num',
-			name : 'gr_num',
-			title : '高级软卧'
-		}, {
-			field : 'rw_num',
-			name : 'rw_num',
-			title : '软卧'
-		}, {
-			field : 'yw_num',
-			name : 'yw_num',
-			title : '硬卧'
-		}, {
-			field : 'yz_num',
-			name : 'yz_num',
-			title : '硬座'
-		}, {
-			field : 'wz_num',
-			name : 'wz_num',
-			title : '无座'
-		}, {
-			field : 'booking',
-			name : 'booking',
-			title : '',
-			value : '预定'
-		} ]
-	});
+	var tranDate = $('#tranDate').val();
+	var from_station = $('#fromStation').val();
+	var to_station = $('#toStation').val();
+	var param = {
+		tranDate : tranDate,
+		from_station : from_station,
+		to_station : to_station
+	};
+	dt.settings()[0].ajax.data = param;
+	dt.ajax.reload();
 }

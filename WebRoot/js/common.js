@@ -49,3 +49,61 @@ function makeGrid(obj, columns, data) {
 	htmlStr += '</tbody></table></div>';
 	obj.append(htmlStr);
 }
+var dataTableOption = {
+	autoWidth : true,
+	info : true,
+	lengthChange : true,
+	ordering : true,
+	paging : true,
+	processing : true,
+	serverSide : false,
+	deferRender : true,
+	pagingType : 'full',
+	language : {
+		lengthMenu : '显示 _MENU_ 条记录',
+		search : '',
+		searchPlaceholder : '搜 索...',
+		processing : '正在处理中...',
+		loadingRecords : '载入中...',
+		emptyTable : '暂无记录',
+		infoEmpty : '',
+		info : '第_PAGE_页，共_PAGES_页',
+		infoFiltered : '(由_MAX_条记录过滤)',
+		paginate : {
+			first : '首页', //&laquo;
+			previous : '上一页',
+			next : '下一页',
+			last : '末页' //&raquo;
+		}
+	},
+	columns : [],
+	ajax : {
+		url : '',
+		type : 'POST',
+		data : {
+			page : 1,
+			rows : 10
+		},
+		dataType : 'json',
+		dataSrc : 'rows'
+	}
+}
+/**
+ * 日期格式化
+ * 
+ * @param date
+ * @returns {String}
+ */
+function dateFormat(date) {
+	date = new Date(date);
+	var y = date.getFullYear();
+	var m = date.getMonth() + 1;
+	if (m < 10) {
+		m = '0' + m;
+	}
+	var d = date.getDate();
+	if (d < 10) {
+		d = '0' + d;
+	}
+	return y + '-' + m + '-' + d;
+}
